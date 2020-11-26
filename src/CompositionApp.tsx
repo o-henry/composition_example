@@ -1,20 +1,23 @@
-// https://www.youtube.com/watch?v=3XaXKiXtNjw&list=WL&index=1&t=11s
 import React from "react";
 
-function App() {
-  // global state
-  // 상태관리를 최상단 App에서 하지만, 4층의 prop-drilling이 발생
+function CompositionApp() {
+  // black-box : we don't know all of the stuff that it renders right and we use children prop
   let [currentUser, setCurrentUser] = React.useState<any>(null);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ backgroundColor: "gray" }}>
+      <div style={{ backgroundColor: "gray", marginTop: "5rem" }}>
         <Header />
       </div>
 
       <div style={{ flex: 1 }}>
         {currentUser ? (
-          <Dashboard user={currentUser} />
+          <Dashboard>
+            <DashboardNav />
+            <DashboardContent>
+              <WelcomeMessage user={currentUser} />
+            </DashboardContent>
+          </Dashboard>
         ) : (
           <LoginScreen onLogin={() => setCurrentUser({ name: "Michael" })} />
         )}
@@ -33,7 +36,7 @@ function App() {
 function Header() {
   return (
     <div>
-      <h1>Prop-drilling Header</h1>
+      <h1>Composition Version Header</h1>
     </div>
   );
 }
@@ -52,14 +55,14 @@ function LoginScreen({ onLogin }: any) {
 
 /**
  * @component
- * prop-drilling
+ * black-box
+ * customizable
  */
-function Dashboard({ user }: any) {
+function Dashboard({ children }: any) {
   return (
     <div>
       <h2>The Dashboard</h2>
-      <DashboardNav />
-      <DashboardContent user={user} />
+      {children}
     </div>
   );
 }
@@ -77,13 +80,13 @@ function DashboardNav() {
 
 /**
  * @component
- * prop-drilling
+ * Like a black-box
  */
-function DashboardContent({ user }: any) {
+function DashboardContent({ children }: any) {
   return (
     <div>
       <h3>Dashboard Content</h3>
-      <WelcomeMessage user={user} />
+      {children}
     </div>
   );
 }
@@ -110,4 +113,4 @@ function Footer() {
   );
 }
 
-export default App;
+export default CompositionApp;
